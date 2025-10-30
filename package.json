@@ -1,0 +1,23 @@
+{
+  "name": "user-account-service",
+  "version": "1.0.0",
+  "description": "A sample code for the uni-cart services",
+  "main": "src/server.js",
+  "scripts": {
+    "seed": "node src/database/seeds/seed.js",
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "author": "chungsik song",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^9.9.0",
+    "nodemon": "^3.1.10"
+  }
+}
