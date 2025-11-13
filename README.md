@@ -18,26 +18,51 @@ A RESTful microservice for managing shopping carts, built with Node.js, Express,
 
 ```
 ShoppingCartService_CMPE131/
-├── src/
-│   ├── api/
-│   │   ├── controllers/        # Request handlers
-│   │   ├── routes/             # API endpoints
-│   │   └── middlewares/        # Authentication
-│   ├── config/
-│   │   └── database.js         # Database setup
-│   ├── services/               # Business logic
-│   ├── repositories/           # Database queries
-│   ├── database/
-│   │   ├── schema.sql          # Database schema
-│   │   └── seed.js             # Test data
-│   ├── app.js                  # Express app
-│   └── server.js               # Entry point
-├── openapi.yaml                # API specification
-├── .env                        # Environment variables
-├── package.json
-└── README.md
-```
-
+│
+├── 📂 node_modules/                    # Dependencies managed by npm
+│
+├── 📂 src/
+│   │
+│   ├── 📂 api/
+│   │   ├── 📂 controllers/             # Request/response handlers
+│   │   │   ├── user.controller.js      # User CRUD operations
+│   │   │   └── cart.controller.js      # Cart operations (getCart, addItem, updateItem, removeItem, clearCart)
+│   │   │
+│   │   ├── 📂 routes/                  # API endpoint definitions
+│   │   │   ├── user.routes.js          # User API routes
+│   │   │   └── cart.routes.js          # Cart API routes (GET, POST, PUT, DELETE /api/cart)
+│   │   │
+│   │   └── 📂 middlewares/             # Reusable middleware functions
+│   │       └── auth.middleware.js      # Authentication via x-user-id header (mock JWT)
+│   │
+│   ├── 📂 config/
+│   │   └── database.js                 # SQLite connection and table initialization
+│   │
+│   ├── 📂 database/
+│   │   ├── schema.sql                  # Cart and cart_items table definitions
+│   │   └── seed.js                     # Test data seeding script
+│   │
+│   ├── 📂 services/                    # Business logic layer
+│   │   ├── user.service.js             # User business logic
+│   │   └── cart.service.js             # Cart operations with validation and product verification
+│   │
+│   ├── 📂 repositories/                # Data access layer
+│   │   ├── user.repository.js          # User database queries
+│   │   └── cart.repository.js          # Cart database queries (CRUD operations)
+│   │
+│   ├── 📂 utils/                       # Helper/utility functions
+│   │
+│   ├── app.js                          # Express app configuration and middleware setup
+│   └── server.js                       # Application entry point, starts HTTP server
+│
+├── .env                                # Environment variables (local only, not committed)
+├── .env.example                        # Environment configuration template
+├──  openapi.yaml                       # API specification
+├── .gitignore                          # Files and folders for Git to ignore
+├── db.sqlite                           # SQLite database file (auto-created, ignored by git)
+├── package.json                        # Project metadata and dependencies
+├── package-lock.json                   # Dependency version lock file
+└── README.md                           # Project documentation
 ---
 
 ## 🚀 Getting Started
