@@ -1,5 +1,5 @@
 // database/seed.js
-const dbPromise = require('../config/database');
+const dbPromise = require('../../config/database');
 
 async function seedDatabase() {
     try {

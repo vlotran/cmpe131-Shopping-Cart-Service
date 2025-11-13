@@ -1,28 +1,54 @@
-// index.js
 const express = require('express');
-// 1. Import the router
-const userRoutes = require('./api/routes/user.routes.js'); 
+const userRoutes = require('./api/routes/user.routes.js');
+const cartRoutes = require('./api/routes/cart.routes.js');
 
 const app = express();
 
-// Middleware to parse JSON bodies
+// Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.use('/api', userRoutes);
+app.use('/api', cartRoutes);
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        message: 'Shopping Cart Service is running',
+        timestamp: new Date().toISOString()
+    });
+});
 
 // Root endpoint
-app.get("/", (req, res, next) => {
-    res.json({"message":"Ok"});
+app.get('/', (req, res) => {
+    res.json({
+        service: 'Shopping Cart Service',
+        version: '1.0.0',
+        endpoints: {
+            health: '/health',
+            users: '/api/users',
+            cart: '/api/cart'
+        }
+    });
 });
 
-// 2. Mount the router
-// This tells Express to use the userRoutes for any request that starts with "/api"
-app.use('/api', userRoutes);
-
-// Default response for any other request (404)
-app.use(function(req, res){
-    // You might want to send a proper 404 response
-    res.status(404).json({ "error": "Endpoint not found" });
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({ 
+        error: 'Route not found',
+        path: req.path 
+    });
 });
 
-// Export the configured app
+// Error handler
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ 
+        error: 'Something went wrong!',
+        message: err.message 
+    });
+});
+
 module.exports = app;
-
