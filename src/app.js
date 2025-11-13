@@ -1,11 +1,25 @@
 const express = require('express');
+const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const path = require('path');
 const cartRoutes = require('./api/routes/cart.routes.js');
 
 const app = express();
 
+// Load OpenAPI specification
+const swaggerDocument = YAML.load(path.join(__dirname, '../openapi.yaml'));
+
 // Middleware
+app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Swagger UI Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Shopping Cart API Documentation'
+}));
 
 // Routes - Mount cart routes at /api/cart
 app.use('/api/cart', cartRoutes);
@@ -24,8 +38,10 @@ app.get('/', (req, res) => {
     res.json({
         service: 'Shopping Cart Service',
         version: '1.0.0',
+        documentation: '/api-docs',
         endpoints: {
             health: '/health',
+            swagger: '/api-docs',
             cart: {
                 getCart: 'GET /api/cart',
                 addItem: 'POST /api/cart/items',

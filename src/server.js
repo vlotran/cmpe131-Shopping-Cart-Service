@@ -25,6 +25,9 @@ async function startServer() {
             console.log(`💾 Database: ${process.env.DB_PATH || './db.sqlite'}`);
             console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            console.log('📚 API Documentation:');
+            console.log(`   Swagger UI: http://localhost:${PORT}/api-docs`);
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
             console.log('📋 Available Endpoints:');
             console.log(`   GET    http://localhost:${PORT}/health`);
             console.log(`   GET    http://localhost:${PORT}/api/cart`);
