@@ -1,9 +1,9 @@
-const dbPromise = require('../config/database');
+const { getDatabase } = require('../config/database');
 
 class CartRepository {
     // Get or create cart for a user
     async getOrCreateCart(userId) {
-        const db = await dbPromise;
+        const db = await getDatabase();
         
         let cart = await db.get(
             'SELECT * FROM carts WHERE user_id = ?',
@@ -26,7 +26,7 @@ class CartRepository {
 
     // Get cart with items
     async getCartWithItems(cartId) {
-        const db = await dbPromise;
+        const db = await getDatabase();
         
         const rows = await db.all(`
             SELECT 
@@ -62,7 +62,7 @@ class CartRepository {
 
     // Add item to cart
     async addItem(cartId, productId, quantity) {
-        const db = await dbPromise;
+        const db = await getDatabase();
 
         // Check if item already exists
         const existingItem = await db.get(
@@ -93,7 +93,7 @@ class CartRepository {
 
     // Update item quantity
     async updateItemQuantity(cartId, productId, quantity) {
-        const db = await dbPromise;
+        const db = await getDatabase();
 
         const result = await db.run(
             `UPDATE cart_items 
@@ -108,7 +108,7 @@ class CartRepository {
 
     // Remove item from cart
     async removeItem(cartId, productId) {
-        const db = await dbPromise;
+        const db = await getDatabase();
 
         const result = await db.run(
             'DELETE FROM cart_items WHERE cart_id = ? AND product_id = ?',
@@ -120,7 +120,7 @@ class CartRepository {
 
     // Clear cart (delete all items)
     async clearCart(cartId) {
-        const db = await dbPromise;
+        const db = await getDatabase();
 
         const result = await db.run(
             'DELETE FROM cart_items WHERE cart_id = ?',
