@@ -1,7 +1,7 @@
 # Shopping Cart Service - CMPE 131
 
 A RESTful microservice for managing shopping carts, built with Node.js, Express, and SQLite.
-
+---
 ## ✨ Features
 
 - Complete CRUD operations for shopping cart management
@@ -10,14 +10,14 @@ A RESTful microservice for managing shopping carts, built with Node.js, Express,
 - Mock authentication (ready for JWT integration)
 - Interactive API documentation with Swagger UI
 - CORS enabled for frontend integration
-
+---
 ## 🚀 Getting Started
 
 ### Prerequisites
 
 - Node.js (v14 or later)
 - npm
-
+---
 ## 📂 Project Structure
 ```
 📦 ShoppingCartService_CMPE131/
