@@ -1,37 +1,60 @@
-// seed.js (with Faker)
-const dbPromise = require('../../config/database');
-const { faker } = require('@faker-js/faker');
+// database/seed.js
+const { getDatabase, closeDatabase } = require('../../config/database');
 
-async function seed() {
+async function seedDatabase() {
     try {
-        const db = await dbPromise;
+        const db = await getDatabase();
 
-        console.log('Deleting existing users...');
-        await db.run('DELETE FROM users');
-        await db.run('DELETE FROM sqlite_sequence WHERE name = ?', 'users');
+        console.log('🌱 Starting database seed...');
 
-        console.log('Inserting 20 fake users...');
+        // Seed test users
+        console.log('Seeding users...');
+        await db.run(`
+            INSERT OR IGNORE INTO users (id, name, email) VALUES
+            (1, 'Alex Buyer', 'alex@example.com'),
+            (2, 'Jane Smith', 'jane@example.com'),
+            (3, 'Bob Johnson', 'bob@example.com')
+        `);
+        console.log('✅ Users seeded');
 
-        const insertPromises = [];
-        for (let i = 0; i < 20; i++) {
-            const name = faker.person.fullName();
-            const email = faker.internet.email({ firstName: name.split(' ')[0], provider: 'example.com' }); // More realistic emails
+        // Clear existing cart data for clean seed
+        await db.run('DELETE FROM cart_items');
+        await db.run('DELETE FROM carts');
+        console.log('🧹 Cleared existing cart data');
 
-            const sql = 'INSERT INTO users (name, email) VALUES (?, ?)';
-            insertPromises.push(db.run(sql, name, email));
-        }
+        // Seed test carts
+        console.log('Seeding carts...');
+        await db.run(`
+            INSERT INTO carts (id, user_id) VALUES
+            (1, 1),
+            (2, 2)
+        `);
+        console.log('✅ Carts seeded');
 
-        await Promise.all(insertPromises);
+        // Seed test cart items
+        console.log('Seeding cart items...');
+        await db.run(`
+            INSERT INTO cart_items (cart_id, product_id, quantity) VALUES
+            (1, 101, 2),
+            (1, 102, 1),
+            (2, 103, 3)
+        `);
+        console.log('✅ Cart items seeded');
 
-        console.log('Database seeded with fake data!');
-
+        console.log('🎉 Database seeded successfully!');
+        console.log('');
+        console.log('Test data created:');
+        console.log('- User 1 (Alex): Cart with 2 items (Product 101: qty 2, Product 102: qty 1)');
+        console.log('- User 2 (Jane): Cart with 1 item (Product 103: qty 3)');
+        console.log('- User 3 (Bob): No cart (will be created on first use)');
+        
+        await closeDatabase();
+        process.exit(0);
     } catch (error) {
-        console.error('Error seeding the database:', error);
-    } finally {
-        const db = await dbPromise;
-        await db.close();
-        console.log('Database connection closed.');
+        console.error('❌ Error seeding database:', error);
+        await closeDatabase();
+        process.exit(1);
     }
 }
 
-seed();
+seedDatabase();

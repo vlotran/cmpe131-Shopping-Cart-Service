@@ -1,0 +1,404 @@
+openapi: 3.1.0
+info:
+  title: Shopping Cart Service API
+  description: RESTful API for managing shopping carts and cart items
+  contact: {}
+  version: '1.0.0'
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+    variables: {}
+paths:
+  /cart:
+    get:
+      tags:
+        - Cart
+      summary: Get Current User's Cart
+      description: Retrieve the authenticated user's shopping cart with all items
+      operationId: getCart
+      parameters:
+        - name: x-user-id
+          in: header
+          description: User ID for authentication (mock)
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Successfully retrieved cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+              example:
+                message: success
+                data:
+                  cart_id: 1
+                  user_id: 1
+                  items:
+                    - id: 1
+                      product_id: 101
+                      quantity: 2
+                      created_at: '2025-01-15T10:30:00Z'
+                      updated_at: '2025-01-15T10:30:00Z'
+                  item_count: 1
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: 'Authentication required. Please provide x-user-id header.'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      deprecated: false
+    delete:
+      tags:
+        - Cart
+      summary: Clear Entire Cart
+      description: Remove all items from the authenticated user's cart
+      operationId: clearCart
+      parameters:
+        - name: x-user-id
+          in: header
+          description: User ID for authentication (mock)
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '204':
+          description: Cart cleared successfully (no content)
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      deprecated: false
+    parameters: []
+  /cart/items:
+    post:
+      tags:
+        - Cart Items
+      summary: Add Item to Cart
+      description: Add a product with specified quantity to the cart
+      operationId: addItem
+      parameters:
+        - name: x-user-id
+          in: header
+          description: User ID for authentication (mock)
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        description: Product and quantity to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddItemRequest'
+            example:
+              productId: 101
+              quantity: 2
+        required: true
+      responses:
+        '200':
+          description: Item added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+              example:
+                message: success
+                data:
+                  cart_id: 1
+                  user_id: 1
+                  items:
+                    - id: 1
+                      product_id: 101
+                      quantity: 2
+                      created_at: '2025-01-15T10:30:00Z'
+                      updated_at: '2025-01-15T10:30:00Z'
+                  item_count: 1
+        '400':
+          description: Invalid request (missing or invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: 'Product ID is required'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: 'Product not found'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      deprecated: false
+    parameters: []
+  /cart/items/{productId}:
+    put:
+      tags:
+        - Cart Items
+      summary: Update Item Quantity
+      description: Update the quantity of a specific item in the cart
+      operationId: updateItem
+      parameters:
+        - name: productId
+          in: path
+          description: Product ID to update
+          required: true
+          schema:
+            type: integer
+            example: 101
+        - name: x-user-id
+          in: header
+          description: User ID for authentication (mock)
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        description: New quantity for the item
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateItemRequest'
+            example:
+              quantity: 5
+        required: true
+      responses:
+        '200':
+          description: Item quantity updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+              example:
+                message: success
+                data:
+                  cart_id: 1
+                  user_id: 1
+                  items:
+                    - id: 1
+                      product_id: 101
+                      quantity: 5
+                      created_at: '2025-01-15T10:30:00Z'
+                      updated_at: '2025-01-15T10:35:00Z'
+                  item_count: 1
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: 'Quantity is required'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Item not found in cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: 'Item not found in cart'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      deprecated: false
+    delete:
+      tags:
+        - Cart Items
+      summary: Remove Item from Cart
+      description: Remove a specific item from the cart
+      operationId: removeItem
+      parameters:
+        - name: productId
+          in: path
+          description: Product ID to remove
+          required: true
+          schema:
+            type: integer
+            example: 101
+        - name: x-user-id
+          in: header
+          description: User ID for authentication (mock)
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Item removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+              example:
+                message: success
+                data:
+                  cart_id: 1
+                  user_id: 1
+                  items: []
+                  item_count: 0
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Item not found in cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: 'Item not found in cart'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      deprecated: false
+    parameters: []
+components:
+  schemas:
+    AddItemRequest:
+      title: AddItemRequest
+      required:
+        - productId
+        - quantity
+      type: object
+      properties:
+        productId:
+          type: integer
+          description: ID of the product to add
+          example: 101
+        quantity:
+          type: integer
+          description: Quantity of the product
+          minimum: 1
+          example: 2
+      example:
+        productId: 101
+        quantity: 2
+    UpdateItemRequest:
+      title: UpdateItemRequest
+      required:
+        - quantity
+      type: object
+      properties:
+        quantity:
+          type: integer
+          description: New quantity for the item (0 to remove)
+          minimum: 0
+          example: 5
+      example:
+        quantity: 5
+    CartItem:
+      title: CartItem
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Cart item ID
+          example: 1
+        product_id:
+          type: integer
+          description: Product ID
+          example: 101
+        quantity:
+          type: integer
+          description: Quantity of product
+          example: 2
+        created_at:
+          type: string
+          format: date-time
+          description: Item creation timestamp
+          example: '2025-01-15T10:30:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: '2025-01-15T10:30:00Z'
+    Cart:
+      title: Cart
+      type: object
+      properties:
+        cart_id:
+          type: integer
+          description: Cart ID
+          example: 1
+        user_id:
+          type: integer
+          description: User ID who owns the cart
+          example: 1
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
+          description: List of items in cart
+        item_count:
+          type: integer
+          description: Total number of different items
+          example: 2
+    CartResponse:
+      title: CartResponse
+      type: object
+      properties:
+        message:
+          type: string
+          example: success
+        data:
+          $ref: '#/components/schemas/Cart'
+    ErrorResponse:
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: 'Authentication required. Please provide x-user-id header.'
+tags:
+  - name: Cart
+    description: API endpoints for managing shopping carts
+  - name: Cart Items
+    description: API endpoints for managing items within a cart
