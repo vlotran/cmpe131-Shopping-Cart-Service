@@ -20,8 +20,45 @@ A RESTful microservice for managing shopping carts, built with Node.js, Express,
 
 - Node.js (v14 or later)
 - npm
-
    ```
+## 📂 Project Structure
+```
+📦 ShoppingCartService_CMPE131/
+│
+├── 📁 src/
+│   ├── 📁 api/
+│   │   ├── 📁 controllers/
+│   │   │   └── 📄 cart.controller.js       # Cart request handlers
+│   │   ├── 📁 middlewares/
+│   │   │   └── 📄 auth.middleware.js       # Mock authentication
+│   │   └── 📁 routes/
+│   │       └── 📄 cart.routes.js           # Cart API endpoints
+│   │
+│   ├── 📁 config/
+│   │   └── 📄 database.js                  # Database connection & setup
+│   │
+│   ├── 📁 database/
+│   │   ├── 📄 schema.sql                   # Cart tables schema
+│   │   └── 📄 seed.js                      # Test data seeding
+│   │
+│   ├── 📁 repositories/
+│   │   └── 📄 cart.repository.js           # Database queries
+│   │
+│   ├── 📁 services/
+│   │   └── 📄 cart.service.js              # Business logic
+│   │
+│   ├── 📄 app.js                           # Express app configuration
+│   └── 📄 server.js                        # Application entry point
+│
+├── 📄 .env                                 # Environment variables (not in git)
+├── 📄 .env.example                         # Environment template
+├── 📄 .gitignore                           # Git ignore rules
+├── 🗄️ db.sqlite                            # SQLite database (auto-generated)
+├── 📄 openapi.yaml                         # OpenAPI 3.1 specification
+├── 📦 package.json                         # Project dependencies
+├── 📦 package-lock.json                    # Dependency lock file
+└── 📖 README.md                            # This file
+```
 ### Installation
 
 1. **Clone the repository:**
