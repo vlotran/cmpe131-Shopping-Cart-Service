@@ -1,7 +1,7 @@
 # Shopping Cart Service - CMPE 131
 
 A RESTful microservice for managing shopping carts, built with Node.js, Express, and SQLite.
----
+
 ## ✨ Features
 
 - Complete CRUD operations for shopping cart management
