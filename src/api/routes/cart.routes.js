@@ -10,18 +10,18 @@ const authMiddleware = require('../middlewares/auth.middleware.js');
 router.use(authMiddleware);
 
 // GET /api/cart - Get the current user's cart
-router.get("/cart", cartController.getCart);
+router.get("/", cartController.getCart);
 
 // POST /api/cart/items - Add an item (product ID and quantity) to the cart
-router.post("/cart/items", cartController.addItem);
+router.post("/items", cartController.addItem);
 
 // PUT /api/cart/items/:productId - Update the quantity of an item in the cart
-router.put("/cart/items/:productId", cartController.updateItem);
+router.put("/items/:productId", cartController.updateItem);
 
 // DELETE /api/cart/items/:productId - Remove an item from the cart
-router.delete("/cart/items/:productId", cartController.removeItem);
+router.delete("/items/:productId", cartController.removeItem);
 
 // DELETE /api/cart - Clear the entire cart
-router.delete("/cart", cartController.clearCart);
+router.delete("/", cartController.clearCart);
 
 module.exports = router;
