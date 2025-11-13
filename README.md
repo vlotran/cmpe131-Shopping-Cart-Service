@@ -1,4 +1,3 @@
-```markdown
 # Shopping Cart Service - CMPE 131
 
 A RESTful microservice for managing shopping carts, built with Node.js, Express, and SQLite.
@@ -20,7 +19,7 @@ A RESTful microservice for managing shopping carts, built with Node.js, Express,
 
 - Node.js (v14 or later)
 - npm
-   ```
+
 ## 📂 Project Structure
 ```
 📦 ShoppingCartService_CMPE131/
