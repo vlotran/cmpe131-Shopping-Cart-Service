@@ -1,77 +1,84 @@
-Of course. Here is the provided information converted into a comprehensive `README.md` file.
+# Shopping Cart Service - CMPE 131
 
------
-
-# Node.js & Express API Boilerplate
-
-This project is a comprehensive, best-practice boilerplate for creating scalable and maintainable Node.js applications with Express. The structure is designed to be logical and easy to navigate, promoting a clear separation of concerns by isolating the API layer, business logic, and data access layer.
-
-The core application logic lives inside the `src` directory to keep it separate from configuration files, tests, and other project metadata.
+A scalable Node.js microservice for managing shopping cart operations, built with Express and SQLite. This service follows a layered architecture with clear separation of concerns between API, business logic, and data access layers.
 
 ## ✨ Features
 
-  * **Scalable Folder Structure**: A professional structure that separates API (routes, controllers), services (business logic), and repositories (data access).
-  * **Separation of Concerns**: Clear distinction between the Express app configuration (`app.js`) and the server startup logic (`server.js`), which is crucial for testing.
-  * **Centralized Configuration**: Uses `dotenv` to manage environment variables for different environments (development, production).
-  * **Asynchronous Database Setup**: Modern, promise-based SQLite setup using `async/await` to prevent race conditions.
-  * **Data Access Layer**: Isolates all database queries in a `repositories` folder, making it easy to switch databases in the future.
-  * **Database Seeding**: Includes a seeding script with `@faker-js/faker` to populate the database with realistic test data.
+* **Complete Shopping Cart API**: Full CRUD operations for cart management
+* **Layered Architecture**: Separation of concerns with API, Service, and Repository layers
+* **SQLite Database**: Lightweight, file-based database with foreign key support
+* **User Isolation**: Each user has their own cart with automatic creation
+* **Mock Authentication**: Header-based authentication (ready for JWT integration)
+* **Auto-increment Quantities**: Adding existing items increases quantity automatically
+* **Input Validation**: Comprehensive validation for all cart operations
+* **Test Data Seeding**: Populate database with sample data for testing
 
 -----
 
 ## 📂 Folder Structure
 
 ```
-/your-project-name
-|
-|-- 📂 node_modules/         # Dependencies managed by npm
-|-- 📂 src/                  # The heart of your application source code
-|   |-- 📂 api/              # API layer: routes, controllers, and middleware
-|   |   |-- 📂 routes/       # Defines the API endpoints (e.g., /users, /products)
-|   |   |   `-- users.routes.js
-|   |   |-- 📂 controllers/  # Handles the request/response logic for each route
-|   |   |   `-- user.controller.js
-|   |   `-- 📂 middlewares/  # Reusable middleware functions
-|   |
-|   |-- 📂 config/           # All application configuration
-|   |   |-- database.js      # Database connection setup (SQLite)
-|   |   `-- index.js         # Loads and exports all config (especially from .env)
-|   |
-|   |-- 📂 database/         # Database-related files like seeds and migrations
-|   |   `-- 📂 seeds/        # Seed files to populate the DB with initial data
-|   |       `-- seed.js
-|   |
-|   |-- 📂 services/         # Business Logic Layer (The "brains" of the app)
-|   |   `-- user.service.js
-|   |
-|   |-- 📂 repositories/     # Data Access Layer (interacts directly with the DB)
-|   |   `-- user.repository.js
-|   |
-|   |-- 📂 utils/            # Utility/helper functions
-|   |
-|   |-- app.js               # Express app configuration and setup
-|   `-- server.js            # The main entry point that starts the server
-|
-|-- .env                     # Environment variables (NEVER commit to git)
-|-- .env.example             # Example environment file
-|-- .gitignore               # Files and folders for Git to ignore
-|-- package.json             # Project metadata and dependencies
-`-- README.md                # Project documentation
+ShoppingCartService_CMPE131/
+│
+├── 📂 node_modules/                    # Dependencies managed by npm
+│
+├── 📂 src/
+│   │
+│   ├── 📂 api/
+│   │   ├── 📂 controllers/             # Request/response handlers
+│   │   │   ├── user.controller.js      # User CRUD operations
+│   │   │   └── cart.controller.js      # Cart operations
+│   │   │
+│   │   ├── 📂 routes/                  # API endpoint definitions
+│   │   │   ├── user.routes.js          # User API routes
+│   │   │   └── cart.routes.js          # Cart API routes
+│   │   │
+│   │   └── 📂 middlewares/             # Reusable middleware functions
+│   │       └── auth.middleware.js      # Authentication middleware
+│   │
+│   ├── 📂 config/
+│   │   └── database.js                 # SQLite connection and initialization
+│   │
+│   ├── 📂 database/
+│   │   ├── schema.sql                  # Cart table definitions
+│   │   └── seed.js                     # Test data seeding script
+│   │
+│   ├── 📂 services/                    # Business logic layer
+│   │   ├── user.service.js             # User business logic
+│   │   └── cart.service.js             # Cart operations with validation
+│   │
+│   ├── 📂 repositories/                # Data access layer
+│   │   ├── user.repository.js          # User database queries
+│   │   └── cart.repository.js          # Cart database queries
+│   │
+│   ├── 📂 utils/                       # Helper/utility functions
+│   │
+│   ├── app.js                          # Express app configuration
+│   └── server.js                       # Application entry point
+│
+├── .env                                # Environment variables (not committed)
+├── .env.example                        # Environment configuration template
+├── .gitignore                          # Git ignore rules
+├── db.sqlite                           # SQLite database (auto-created)
+├── package.json                        # Project metadata and dependencies
+├── package-lock.json                   # Dependency version lock
+└── README.md                           # Project documentation
 ```
 
 -----
 
 ## 🚀 How a Request Flows
 
-Here’s how a `POST` request to `/api/user` travels through the application:
+Here's how a `POST` request to `/api/cart/items` travels through the application:
 
-1.  **`server.js`**: Starts the server, which listens for incoming requests.
-2.  **`app.js`**: Receives the request. It has been configured to route any path starting with `/api` to the appropriate router.
-3.  **`api/routes/user.routes.js`**: Matches the `POST /user` endpoint and calls the `userController.createUser` function.
-4.  **`api/controllers/user.controller.js`**: The `createUser` function extracts data from `req.body` and calls `userService.createUser(userData)`. The controller's job is only to manage the request and response, not to perform business logic.
-5.  **`services/user.service.js`**: The `createUser` function contains the business logic. It validates the data, checks if the user already exists, and finally calls `userRepository.create(newUser)`.
-6.  **`repositories/user.repository.js`**: The `create` function executes the `INSERT INTO users (...)` SQL query against the database.
-7.  **Response**: The result bubbles back up the chain, and the controller sends a `201 Created` status and the new user data back to the client.
+1. **`server.js`**: Starts the server and initializes the database
+2. **`app.js`**: Receives the request and routes to appropriate handler
+3. **`api/routes/cart.routes.js`**: Matches the `POST /cart/items` endpoint
+4. **`api/middlewares/auth.middleware.js`**: Verifies user authentication via `x-user-id` header
+5. **`api/controllers/cart.controller.js`**: Extracts request data and calls `cartService.addItem()`
+6. **`services/cart.service.js`**: Validates input, performs business logic, calls repository
+7. **`repositories/cart.repository.js`**: Executes database queries (INSERT/UPDATE)
+8. **Response**: Result flows back up, controller sends JSON response with status code
 
 -----
 
@@ -79,74 +86,294 @@ Here’s how a `POST` request to `/api/user` travels through the application:
 
 ### Prerequisites
 
-  * [Node.js](https://nodejs.org/) (v14 or later recommended)
-  * [npm](https://www.npmjs.com/)
+* [Node.js](https://nodejs.org/) (v14 or later)
+* [npm](https://www.npmjs.com/)
+* [Git](https://git-scm.com/)
 
 ### Installation & Setup
 
-1.  **Clone the repository:**
+1. **Clone the repository:**
 
-    ```bash
-    git clone <your-repository-url>
-    cd your-project-name
-    ```
+   ```bash
+   git clone https://github.com/yourusername/ShoppingCartService_CMPE131.git
+   cd ShoppingCartService_CMPE131
+   ```
 
-2.  **Install dependencies:**
+2. **Install dependencies:**
 
-    ```bash
-    npm install
-    ```
+   ```bash
+   npm install
+   ```
 
-3.  **Set up environment variables:**
-    Create a `.env` file in the root of the project by copying the example file.
+3. **Set up environment variables:**
 
-    ```bash
-    cp .env.example .env
-    ```
+   ```bash
+   cp .env.example .env
+   ```
 
-    Open the `.env` file and set your desired `PORT`.
+   Edit `.env` with your configuration:
 
-    ```
-    # .env
-    PORT=3000
-    ```
+   ```env
+   PORT=3000
+   NODE_ENV=development
+   DB_PATH=./db.sqlite
+   PRODUCT_CATALOG_URL=http://localhost:3001
+   ```
 
-    **Important**: The `.env` file is already listed in `.gitignore` to prevent you from accidentally committing sensitive information.
+4. **Seed the database (optional):**
 
-4.  **Seed the database:**
-    Run the seed script to populate your SQLite database with 20 fake users.
+   ```bash
+   npm run seed
+   ```
 
-    ```bash
-    npm run seed
-    ```
+   This creates test users and sample cart data.
 
-5.  **Start the server:**
+5. **Start the server:**
 
-    ```bash
-    npm run start
-    ```
+   ```bash
+   npm run dev
+   ```
 
-    The server will start, and you should see the message: `Server running on port 3000`.
+   The server will start on `http://localhost:3000`
 
 -----
 
 ## 🛠️ Available Scripts
 
-In the `package.json` file, the following scripts are available:
-
-  * `"start"`: Starts the server using `nodemon`, which automatically restarts the application when file changes are detected.
-  * `"seed"`: Runs the `seed.js` script to populate the database with initial data.
+| Script | Command | Description |
+|--------|---------|-------------|
+| **Start** | `npm start` | Start the server in production mode |
+| **Development** | `npm run dev` | Start with nodemon (auto-restart on changes) |
+| **Seed** | `npm run seed` | Populate database with test data |
 
 -----
 
-## Endpoints API
+## 📋 API Endpoints
 
-All endpoints are prefixed with `/api`.
+All cart endpoints require authentication via `x-user-id` header.
 
-| Method  | Endpoint      | Description                  |
-| :------ | :------------ | :--------------------------- |
-| `GET`   | `/users`      | Retrieve all users.          |
-| `GET`   | `/user/:id`   | Retrieve a single user by ID.|
-| `POST`  | `/user`       | Create a new user.           |
-| `PATCH` | `/user/:id`   | Update an existing user.     |
-| `DELETE`| `/user/:id`   | Delete a user by ID.         |
+### Shopping Cart API
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET` | `/api/cart` | Get current user's cart | ✅ Yes |
+| `POST` | `/api/cart/items` | Add item to cart | ✅ Yes |
+| `PUT` | `/api/cart/items/:productId` | Update item quantity | ✅ Yes |
+| `DELETE` | `/api/cart/items/:productId` | Remove item from cart | ✅ Yes |
+| `DELETE` | `/api/cart` | Clear entire cart | ✅ Yes |
+
+### User API
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/users` | Retrieve all users |
+| `GET` | `/user/:id` | Retrieve a single user by ID |
+| `POST` | `/user` | Create a new user |
+| `PATCH` | `/user/:id` | Update an existing user |
+| `DELETE` | `/user/:id` | Delete a user by ID |
+
+### Utility Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/health` | Health check endpoint |
+| `GET` | `/` | Service information |
+
+-----
+
+## 🧪 Testing with Postman/Thunder Client
+
+### 1. View Cart
+
+```http
+GET http://localhost:3000/api/cart
+Headers:
+  x-user-id: 1
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "success",
+  "data": {
+    "cart_id": 1,
+    "user_id": 1,
+    "items": [],
+    "item_count": 0
+  }
+}
+```
+
+### 2. Add Item to Cart
+
+```http
+POST http://localhost:3000/api/cart/items
+Headers:
+  x-user-id: 1
+  Content-Type: application/json
+Body:
+{
+  "productId": 101,
+  "quantity": 2
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "success",
+  "data": {
+    "cart_id": 1,
+    "user_id": 1,
+    "items": [
+      {
+        "id": 1,
+        "product_id": 101,
+        "quantity": 2,
+        "created_at": "2024-01-15T10:30:00.000Z",
+        "updated_at": "2024-01-15T10:30:00.000Z"
+      }
+    ],
+    "item_count": 1
+  }
+}
+```
+
+### 3. Update Item Quantity
+
+```http
+PUT http://localhost:3000/api/cart/items/101
+Headers:
+  x-user-id: 1
+  Content-Type: application/json
+Body:
+{
+  "quantity": 5
+}
+```
+
+### 4. Remove Item
+
+```http
+DELETE http://localhost:3000/api/cart/items/101
+Headers:
+  x-user-id: 1
+```
+
+### 5. Clear Cart
+
+```http
+DELETE http://localhost:3000/api/cart
+Headers:
+  x-user-id: 1
+```
+
+**Response: 204 No Content** (empty response)
+
+-----
+
+## 🗄️ Database Schema
+
+### Carts Table
+```sql
+CREATE TABLE carts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL UNIQUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+```
+
+### Cart Items Table
+```sql
+CREATE TABLE cart_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    cart_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE,
+    UNIQUE(cart_id, product_id)
+);
+```
+
+-----
+
+## 🔐 Authentication
+
+Currently uses **mock authentication** via `x-user-id` header for development.
+
+**Example:**
+```http
+x-user-id: 1
+```
+
+**Future Implementation:** JWT-based authentication (placeholder included in `auth.middleware.js`)
+
+-----
+
+## 📝 User Stories Implemented
+
+### EPIC C-01: Cart Item Management
+- ✅ **C-01.1**: Add item to cart with automatic quantity increment
+- ✅ **C-01.2**: Update item quantity (quantity 0 removes item)
+- ✅ **C-01.3**: Remove item from cart
+
+### EPIC C-02: Cart State & Viewing
+- ✅ **C-02.1**: View cart contents
+- ✅ **C-02.2**: Clear entire cart (204 No Content)
+
+### EPIC C-03: Service & Data Integrity
+- ✅ **C-03.1**: Product verification placeholder (ready for Product Catalog Service integration)
+
+-----
+
+## 🛡️ Error Handling
+
+| Status Code | Scenario | Example |
+|-------------|----------|---------|
+| `200 OK` | Successful operation | Cart retrieved, item added/updated/removed |
+| `204 No Content` | Cart cleared | Empty response body |
+| `400 Bad Request` | Invalid input | Missing productId, negative quantity |
+| `401 Unauthorized` | Missing authentication | No x-user-id header |
+| `404 Not Found` | Resource not found | Item not in cart, product doesn't exist |
+| `500 Internal Server Error` | Server error | Database connection failure |
+
+-----
+
+## 🔧 Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | Server port | `3000` |
+| `NODE_ENV` | Environment | `development` |
+| `DB_PATH` | SQLite database path | `./db.sqlite` |
+| `PRODUCT_CATALOG_URL` | Product service URL | `http://localhost:3001` |
+
+-----
+
+## 🤝 Contributing
+
+This is a class project for CMPE 131. For collaboration:
+
+1. Create a feature branch: `git checkout -b feature/your-feature`
+2. Commit changes: `git commit -m "feat: add feature"`
+3. Push to branch: `git push origin feature/your-feature`
+4. Create a Pull Request
+
+-----
+
+## 📄 License
+
+This project is for educational purposes as part of CMPE 131 coursework.
+
+-----
+
+## 👥 Authors
+
+- Vy Tran  - CMPE 131 Student
+- Melody Deng  - CMPE 131 Student
+- Ben Olson - CMPE 131 Student
+
