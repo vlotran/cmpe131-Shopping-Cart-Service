@@ -21,13 +21,13 @@ A RESTful microservice for managing shopping carts, built with Node.js, Express,
 - Node.js (v14 or later)
 - npm
 
+   ```
 ### Installation
 
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/yourusername/ShoppingCartService_CMPE131.git
    cd ShoppingCartService_CMPE131
-   ```
 
 2. **Install dependencies:**
    ```bash
