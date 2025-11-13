@@ -1,5 +1,4 @@
 const express = require('express');
-const userRoutes = require('./api/routes/user.routes.js');
 const cartRoutes = require('./api/routes/cart.routes.js');
 
 const app = express();
@@ -9,7 +8,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use('/api', userRoutes);
 app.use('/api', cartRoutes);
 
 // Health check endpoint
@@ -28,7 +26,6 @@ app.get('/', (req, res) => {
         version: '1.0.0',
         endpoints: {
             health: '/health',
-            users: '/api/users',
             cart: '/api/cart'
         }
     });
