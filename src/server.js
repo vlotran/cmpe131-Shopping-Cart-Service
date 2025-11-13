@@ -5,17 +5,18 @@
 require('dotenv').config();
 
 const app = require('./app.js');
-const dbPromise = require('./config/database');
+const { getDatabase, closeDatabase } = require('./config/database');
 
 // 2. Use the PORT from process.env, with a fallback for safety
 const PORT = process.env.PORT || 3000;
 
 // 3. Initialize database then start server
-dbPromise
-    .then(() => {
+async function startServer() {
+    try {
+        await getDatabase();
         console.log('✅ Database initialized successfully');
         
-        app.listen(PORT, () => {
+        const server = app.listen(PORT, () => {
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
             console.log('🚀 Shopping Cart Service');
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -33,20 +34,25 @@ dbPromise
             console.log(`   DELETE http://localhost:${PORT}/api/cart`);
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         });
-    })
-    .catch(err => {
+
+        // Handle graceful shutdown
+        const shutdown = async (signal) => {
+            console.log(`\n🛑 ${signal} received. Shutting down gracefully...`);
+            server.close(async () => {
+                await closeDatabase();
+                console.log('✅ Server closed');
+                process.exit(0);
+            });
+        };
+
+        process.on('SIGINT', () => shutdown('SIGINT'));
+        process.on('SIGTERM', () => shutdown('SIGTERM'));
+
+    } catch (err) {
         console.error('❌ Failed to initialize database:', err.message);
         console.error(err);
-        process.exit(1); // Exit with error code
-    });
+        process.exit(1);
+    }
+}
 
-// Handle graceful shutdown
-process.on('SIGINT', async () => {
-    console.log('\n🛑 Shutting down gracefully...');
-    process.exit(0);
-});
-
-process.on('SIGTERM', async () => {
-    console.log('\n🛑 Shutting down gracefully...');
-    process.exit(0);
-});
+startServer();

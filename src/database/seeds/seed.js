@@ -1,9 +1,9 @@
 // database/seed.js
-const dbPromise = require('../../config/database');
+const { getDatabase, closeDatabase } = require('../../config/database');
 
 async function seedDatabase() {
     try {
-        const db = await dbPromise;
+        const db = await getDatabase();
 
         console.log('🌱 Starting database seed...');
 
@@ -48,9 +48,11 @@ async function seedDatabase() {
         console.log('- User 2 (Jane): Cart with 1 item (Product 103: qty 3)');
         console.log('- User 3 (Bob): No cart (will be created on first use)');
         
+        await closeDatabase();
         process.exit(0);
     } catch (error) {
         console.error('❌ Error seeding database:', error);
+        await closeDatabase();
         process.exit(1);
     }
 }

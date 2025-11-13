@@ -7,8 +7,8 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
-app.use('/api', cartRoutes);
+// Routes - Mount cart routes at /api/cart
+app.use('/api/cart', cartRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -26,7 +26,13 @@ app.get('/', (req, res) => {
         version: '1.0.0',
         endpoints: {
             health: '/health',
-            cart: '/api/cart'
+            cart: {
+                getCart: 'GET /api/cart',
+                addItem: 'POST /api/cart/items',
+                updateItem: 'PUT /api/cart/items/:productId',
+                removeItem: 'DELETE /api/cart/items/:productId',
+                clearCart: 'DELETE /api/cart'
+            }
         }
     });
 });
@@ -44,7 +50,7 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ 
         error: 'Something went wrong!',
-        message: err.message 
+        message: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message 
     });
 });
 
