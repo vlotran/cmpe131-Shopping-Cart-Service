@@ -11,8 +11,6 @@ A RESTful microservice for managing shopping carts, built with Node.js, Express,
 - Interactive API documentation with Swagger UI
 - CORS enabled for frontend integration
 
----
-
 ## 🚀 Getting Started
 
 ### Prerequisites
