@@ -1,24 +1,6 @@
 const cartRepository = require('../repositories/cart.repository');
-const axios = require('axios');
-
-const PRODUCT_CATALOG_URL = process.env.PRODUCT_CATALOG_URL || 'http://localhost:3001';
 
 class CartService {
-    // Helper: Verify product exists via Product Catalog Service
-    async verifyProduct(productId) {
-        try {
-            const response = await axios.get(`${PRODUCT_CATALOG_URL}/api/products/${productId}`);
-            return response.data;
-        } catch (error) {
-            if (error.response && error.response.status === 404) {
-                throw new Error('Product not found');
-            }
-            // For development: skip verification if product service unavailable
-            console.warn('Product catalog service unavailable, skipping verification');
-            return { id: productId };
-        }
-    }
-
     // Story C-02.1: View Cart Contents
     async getCart(userId) {
         const cart = await cartRepository.getOrCreateCart(userId);
@@ -35,10 +17,6 @@ class CartService {
         if (!quantity || quantity <= 0) {
             throw new Error('Quantity must be greater than 0');
         }
-
-        // Story C-03.1: Verify product exists (optional for development)
-        // Uncomment when Product Catalog Service is available
-        // await this.verifyProduct(productId);
 
         // Get or create cart
         const cart = await cartRepository.getOrCreateCart(userId);
