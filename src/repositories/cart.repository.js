@@ -1,43 +1,134 @@
-// repositories/user.repository.js (Using the 'sqlite' package)
-const getDbPromise = require('../config/database.js'); // This is a promise now
+const dbPromise = require('../config/database');
 
-class UserRepository {
-    async findAll() {
-        const db = await getDbPromise; // Get the resolved db connection
-        console.log('DB instance in findAll:', db); // Debugging line
-        return await db.all("SELECT * FROM users");
-    }
-
-    async findById(id) {
-        const db = await getDbPromise;
-        // The '?' placeholder is automatically handled
-        return await db.get("SELECT * FROM users WHERE id = ?", id);
-    }
-
-    async create(data) {
-        const db = await getDbPromise;
-        const result = await db.run(
-            'INSERT INTO users (name, email) VALUES (?,?)',
-            data.name, data.email // You can pass params directly
+class CartRepository {
+    // Get or create cart for a user
+    async getOrCreateCart(userId) {
+        const db = await dbPromise;
+        
+        let cart = await db.get(
+            'SELECT * FROM carts WHERE user_id = ?',
+            [userId]
         );
-        // The result object CONTAINS lastID and changes!
-        return { id: result.lastID, ...data };
+
+        if (!cart) {
+            const result = await db.run(
+                'INSERT INTO carts (user_id) VALUES (?)',
+                [userId]
+            );
+            cart = {
+                id: result.lastID,
+                user_id: userId
+            };
+        }
+
+        return cart;
     }
 
-    async update(id, data) {
-        const db = await getDbPromise;
-        const result = await db.run(
-           `UPDATE users set name = COALESCE(?,name), email = COALESCE(?,email) WHERE id = ?`,
-           data.name, data.email, id
+    // Get cart with items
+    async getCartWithItems(cartId) {
+        const db = await dbPromise;
+        
+        const rows = await db.all(`
+            SELECT 
+                c.id as cart_id,
+                c.user_id,
+                ci.id as item_id,
+                ci.product_id,
+                ci.quantity,
+                ci.created_at,
+                ci.updated_at
+            FROM carts c
+            LEFT JOIN cart_items ci ON c.id = ci.cart_id
+            WHERE c.id = ?
+        `, [cartId]);
+
+        const cart = {
+            cart_id: cartId,
+            user_id: rows[0]?.user_id,
+            items: rows
+                .filter(row => row.item_id !== null)
+                .map(row => ({
+                    id: row.item_id,
+                    product_id: row.product_id,
+                    quantity: row.quantity,
+                    created_at: row.created_at,
+                    updated_at: row.updated_at
+                })),
+            item_count: rows.filter(row => row.item_id !== null).length
+        };
+
+        return cart;
+    }
+
+    // Add item to cart
+    async addItem(cartId, productId, quantity) {
+        const db = await dbPromise;
+
+        // Check if item already exists
+        const existingItem = await db.get(
+            'SELECT * FROM cart_items WHERE cart_id = ? AND product_id = ?',
+            [cartId, productId]
         );
-        return { changes: result.changes };
+
+        if (existingItem) {
+            // Update existing item - increase quantity
+            await db.run(
+                `UPDATE cart_items 
+                 SET quantity = quantity + ?,
+                     updated_at = CURRENT_TIMESTAMP
+                 WHERE cart_id = ? AND product_id = ?`,
+                [quantity, cartId, productId]
+            );
+            return { id: existingItem.id, updated: true };
+        } else {
+            // Insert new item
+            const result = await db.run(
+                `INSERT INTO cart_items (cart_id, product_id, quantity)
+                 VALUES (?, ?, ?)`,
+                [cartId, productId, quantity]
+            );
+            return { id: result.lastID, updated: false };
+        }
     }
 
-    async delete(id) {
-        const db = await getDbPromise;
-        const result = await db.run('DELETE FROM users WHERE id = ?', id);
-        return { changes: result.changes };
+    // Update item quantity
+    async updateItemQuantity(cartId, productId, quantity) {
+        const db = await dbPromise;
+
+        const result = await db.run(
+            `UPDATE cart_items 
+             SET quantity = ?, 
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE cart_id = ? AND product_id = ?`,
+            [quantity, cartId, productId]
+        );
+
+        return result.changes;
+    }
+
+    // Remove item from cart
+    async removeItem(cartId, productId) {
+        const db = await dbPromise;
+
+        const result = await db.run(
+            'DELETE FROM cart_items WHERE cart_id = ? AND product_id = ?',
+            [cartId, productId]
+        );
+
+        return result.changes;
+    }
+
+    // Clear cart (delete all items)
+    async clearCart(cartId) {
+        const db = await dbPromise;
+
+        const result = await db.run(
+            'DELETE FROM cart_items WHERE cart_id = ?',
+            [cartId]
+        );
+
+        return result.changes;
     }
 }
 
-module.exports = new UserRepository();
+module.exports = new CartRepository();
